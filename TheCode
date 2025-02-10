@@ -1,0 +1,414 @@
+import os, sys
+from PIL import Image
+from PIL import ImageEnhance
+import random
+#im = Image.open("mj_1.jpg")
+#print(im.format, im.size, im.mode)
+
+def roll(im: Image.Image, delta: int) -> Image.Image:
+   """Roll an image sideways."""
+   xsize, ysize = im.size
+   delta = delta % xsize
+   if delta == 0:
+       return im
+   part1 = im.crop((0, 0, delta, ysize))
+   part2 = im.crop((delta, 0, xsize, ysize))
+   im.paste(part1, (xsize - delta, 0, xsize, ysize))
+   im.paste(part2, (0, 0, xsize - delta, ysize))
+   return im
+
+def merge(im1: Image.Image, im2: Image.Image) -> Image.Image:
+    w = im1.size[0] + im2.size[0]
+    h = max(im1.size[1], im2.size[1])
+    im = Image.new("RGBA", (w, h))
+    im.paste(im1)
+    im.paste(im2, (im1.size[0], 0))
+    return im
+
+print("Welcome to Pycharm Image Editor")
+while True:
+   print(" ")
+   image_name = input("Type the name of your image: ")
+   if os.path.isfile(image_name): #a function that checks if the image is in file
+       infile = image_name
+       im = Image.open(infile)
+       for infile in sys.argv[1:]:
+               f, e = os.path.splitext(infile)
+               outfile = f + ".jpg"
+               if infile != outfile:
+                   try:
+                       with Image.open(infile) as im:
+                           im.save(outfile)
+                   except OSError:
+                       print("cannot convert", infile)
+
+       print("Would you like to edit the image? (yes/no)")
+       x = input()
+       if x.lower() == "yes" or x.lower() == "y":
+         while True:
+           print("What would you like to do? (crop, roll, merge, saturate, enhance)")
+           print("Or would you like to change your image type? (change)")
+           reply = input()
+           if reply.lower() == "crop":
+               print("Here is the size of your image:", im.size)
+               print("Pick a number and the image will be cropped in a square")
+               size = min(im.size)
+               print("This is the max number you can choose:", size)
+               print(" ")
+               while True:
+                   try:
+                       crop = int(input("Type the size of pixels you want to crop the image: "))
+                       break
+                   except ValueError:
+                       print(" ")
+                       continue
+               while True:
+                   try:
+                       rotate = int(input("Type in the rotation (an integer): "))  # Convert input to an integer
+                       break
+                   except ValueError:
+                       print("Please just type a number.")
+                       print(random.choice(["ex. 90", "ex. 180", "ex. 270"]))
+               box = (0, 0, crop, crop) #crops a new image using user's input
+               region = im.crop(box)
+               while True:
+                   print("Would you like your image to be pasted on the original image? y/n")
+                   og = input()
+                   if og.lower() == "n":
+                       print("What would you want to name your new image?")
+                       print("ex. newImage or Jack's Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       region = region.rotate(rotate)
+                       region.show()
+                       region.save(new_image)
+                       break
+                   if og.lower() == "no":
+                       print("What would you want to name your new image?")
+                       print("ex. newImage or Jack's Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       region = region.rotate(rotate)
+                       region.show()
+                       region.save(new_image)
+                       break
+                   if og.lower() == "yes":
+                       print("What would you want to name your new image?")
+                       print("ex. newImage or Jack's Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       region = region.rotate(rotate)
+                       im.paste(region, box)
+                       print(infile, im.format, f"{im.size}x{im.mode}")
+                       im.show()
+                       im.save(new_image)
+                       break
+                   if og.lower() == "y":
+                       print("What would you want to name your new image?")
+                       print("ex. newImage or Jack's Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       region = region.rotate(rotate)
+                       im.paste(region, box)
+                       print(infile, im.format, f"{im.size}x{im.mode}")
+                       im.show()
+                       im.save(new_image)
+                       break
+               print("")
+               break
+           if reply.lower() == "roll":
+               sizy = str(im.size)
+               for xpo in range(len(sizy)):
+                   if sizy[xpo] == ",":
+                       reflect = sizy[1:xpo]
+                       break
+               while True:
+                   amountpercent = input("How much do you want to roll the image? (10%, 25%, 50%, 75%, 100%): ")
+                   if amountpercent == "10%":
+                       print("What would you want to name your new image?")
+                       print("ex. New Life or My Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       reflect = int(reflect) // 10
+                       rolled_im = roll(im, reflect)
+                       rolled_im.show()
+                       rolled_im.save(new_image)
+                       break
+                   if amountpercent == "25%":
+                       print("What would you want to name your new image?")
+                       print("ex. New Life or My Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       reflect = int(reflect) // 4
+                       rolled_im = roll(im, reflect)
+                       rolled_im.show()
+                       rolled_im.save(new_image)
+                       break
+                   elif amountpercent == "50%":
+                       print("What would you want to name your new image?")
+                       print("ex. New Life or My Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       reflect = int(reflect) // 2
+                       rolled_im = roll(im, reflect)
+                       rolled_im.show()
+                       rolled_im.save(new_image)
+                       break
+                   if amountpercent == "75%":
+                       print("What would you want to name your new image?")
+                       print("ex. New Life or My Image")
+                       new_image = input()
+                       new_image = str(new_image) + ".png"
+                       reflect = int(reflect) // 4
+                       rolled_im = roll(im, -reflect)
+                       rolled_im.show()
+                       rolled_im.save(new_image)
+                       break
+                   else:
+                       print("Please answer from one of the choices.")
+                       print(" ")
+               break
+           elif reply.lower() == "merge":
+               while True:
+                   image_two = input("Type the name of another image: ")
+                   if os.path.isfile(image_two):
+                           break
+                   else:
+                       print("Please type the full name of your image.")
+                       print("")
+                       continue
+               inile = image_two
+               im_2 = Image.open(inile)
+               if im_2.format != "JPEG":
+                   for inile in sys.argv[1:]:
+                       f, e = os.path.splitext(inile)
+                       outfile = f + ".jpg"
+                       if inile != outfile:
+                           try:
+                               with Image.open(inile) as im:
+                                   im.save(outfile)
+                           except OSError:
+                               print("cannot convert", inile)
+               print("What would you want to name your new image?")
+               print("ex. HelloWorld or Abracadabra!")
+               new_image = input()
+               new_image = str(new_image) + ".png"
+               merged_im = merge(im, im_2)
+               merged_im.show()
+               merged_im.save(new_image)
+               im = merged_im
+               break
+           elif reply.lower() == "saturate":
+               while True:
+                   saturation = input("Level 1 or Level 1000? or atomic bomb level? (1, 1000): ")
+                   if saturation == "1":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     r, g, b = im.split()
+                     im = Image.merge("RGB", (b, g, r))
+                     im.show()
+                     im.save(new_image)
+                     break
+                   if saturation.lower() == "level1":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     r, g, b = im.split()
+                     im = Image.merge("RGB", (b, g, r))
+                     im.show()
+                     im.save(new_image)
+                     break
+                   if saturation.lower() == "level 1":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     r, g, b = im.split()
+                     im = Image.merge("RGB", (b, g, r))
+                     im.show()
+                     im.save(new_image)
+                     break
+                   if saturation == "1000":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 25
+                     out = im.point(lambda i: i * 25)
+                     out.show()
+                     out.save(new_image)
+                     break
+                   if saturation.lower() == "level 1000":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 25
+                     out = im.point(lambda i: i * 25)
+                     out.show()
+                     out.save(new_image)
+                     break
+                   if saturation.lower() == "level1000":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 25
+                     out = im.point(lambda i: i * 25)
+                     out.show()
+                     out.save(new_image)
+                     break
+                   if saturation.lower() =="atomic bomb level":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 10000
+                     bomb = im.point(lambda i: i * 10000)
+                     bomb.show()
+                     bomb.save(new_image)
+                     break
+                   if saturation.lower() == "atomic bomb":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 10000
+                     bomb = im.point(lambda i: i * 10000)
+                     bomb.show()
+                     bomb.save(new_image)
+                     break
+                   if saturation.lower() == "atomicbomb":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 10000
+                     bomb = im.point(lambda i: i * 10000)
+                     bomb.show()
+                     bomb.save(new_image)
+                     break
+                   elif saturation.lower() == "atomicbomblevel":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 1000
+                     bomb = im.point(lambda i: i * 10000)
+                     bomb.show()
+                     bomb.save(new_image)
+                     break
+                   elif saturation.lower() == "atomicbomb level":
+                     print("What would you want to name your new image?")
+                     print("ex. New or Boom")
+                     new_image = input()
+                     new_image = str(new_image) + ".png"
+                     # multiply each pixel by 1000
+                     bomb = im.point(lambda i: i * 10000)
+                     bomb.show()
+                     bomb.save(new_image)
+                     break
+                   else: print(" ")
+               break
+           elif reply.lower() == "enhance":
+               print("What would you want to name your new image?")
+               print("ex. HelloWorld or Abracadabra!")
+               new_image = input()
+               new_image = str(new_image) + ".png"
+               enh = ImageEnhance.Contrast(im)
+               enh.enhance(1.3).show("30% more contrast")
+               enhance = enh.enhance(1.3)
+               enhance.save(new_image)
+               break
+           elif reply.lower() == "change":
+               print("What would you want to name your new image?")
+               print("ex. newImage or Bob's Image")
+               new_image = input()
+               new_image = str(new_image) + ".png"
+               im = im.convert("L")
+               im.show()
+               print(infile, im.format, f"{im.size}x{im.mode}")
+               im.save(new_image)
+               break
+           else:
+               print("Please type in an appropriate response")
+
+       elif x.lower() == "no":
+           print("Here's your image with no edits")
+           im.show()
+           print("")
+
+       elif x.lower() == "n":
+           print("Here's your image with no edits")
+           im.show()
+           print("")
+
+       print("Do you want to edit more? y/n")
+       answer = input()
+       if answer.lower() == "y":
+           continue
+       if answer.lower() == "yes":
+           continue
+       elif answer.lower() == "n":
+           break
+       elif answer.lower() == "no":
+           break
+       else:
+           print("Please type in the answer as yes or no format.")
+           answer = input()
+           if answer.lower() == "y":
+               continue
+           if answer.lower() == "yes":
+               continue
+           elif answer.lower() == "n":
+               break
+           elif answer.lower() == "no":
+               break
+           else:
+               print("What?")
+               print("I said, Do you want to edit more? y/n")
+               answer = input()
+               if answer.lower() == "yes":
+                   continue
+               if answer.lower() == "y":
+                   continue
+               if answer.lower() == "n":
+                   break
+               if answer.lower() == "no":
+                   break
+               else:
+                   print("What?")
+                   print("Do you not understand?! Do you want to edit more??? y/n")
+                   answer = input()
+                   if answer.lower() == "y":
+                       continue
+                   if answer.lower() == "yes":
+                       continue
+                   if answer.lower() == "n":
+                       break
+                   if answer.lower() == "no":
+                       break
+                   else:
+                      print("It's a simple question! yes or no??? Do you want to edit more???? y/n")
+                      answer = input()
+                      if answer.lower() == "y":
+                         continue
+                      if answer.lower() == "yes":
+                         continue
+                      if answer.lower() == "n":
+                         break
+                      if answer.lower() == "no":
+                         break
+                      else:
+                         print(" ")
+                         print("Get outta here")
+                         break
+   else:
+       print(random.choice(["Oops! That was no valid image name. Try again...",
+                            "Did you upload or save your image?"]))
+print(" ")
+print("Thanks for your time!")
+im.show()
